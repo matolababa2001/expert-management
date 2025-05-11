@@ -1,45 +1,45 @@
+@extends('layouts.app')
 
 @section('content')
-@extends('layouts.app')
-<div class="container mx-auto p-6">
-    <h2 class="text-xl font-bold mb-4">Add New Expert</h2>
-    <form action="{{ route('experts.store') }}" method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded shadow-md">
-        @csrf
-        <div class="mb-4">
-            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-            <input type="text" name="name" class="w-full border rounded p-2 mt-1" required>
-        </div>
+<div class="container mx-auto px-4">
+    <h1 class="text-2xl font-bold mb-4">Manage Experts</h1>
 
-        <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email" class="w-full border rounded p-2 mt-1" required>
-        </div>
+    <a href="{{ route('experts.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 inline-block">Add New Expert</a>
 
-        <div class="mb-4">
-            <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
-            <input type="text" name="location" class="w-full border rounded p-2 mt-1" required>
-        </div>
+    @if (session('success'))
+        <div class="bg-green-200 text-green-800 p-2 rounded mb-4">{{ session('success') }}</div>
+    @endif
 
-        <div class="mb-4">
-            <label for="skills" class="block text-sm font-medium text-gray-700">Skills</label>
-            <select name="skills[]" multiple class="w-full border rounded p-2 mt-1">
-                @foreach ($skills as $skill)
-                    <option value="{{ $skill->id }}">{{ $skill->name }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label for="certificate" class="block text-sm font-medium text-gray-700">Certificate (PDF)</label>
-            <input type="file" name="certificate" accept="application/pdf" class="w-full mt-1">
-        </div>
-
-        <div class="mb-4">
-            <label for="photo" class="block text-sm font-medium text-gray-700">Photo</label>
-            <input type="file" name="photo" accept="image/*" class="w-full mt-1">
-        </div>
-
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Expert</button>
-    </form>
+    <table class="table-auto w-full border-collapse border border-gray-300">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border px-4 py-2">Name</th>
+                <th class="border px-4 py-2">Email</th>
+                <th class="border px-4 py-2">Location</th>
+                <th class="border px-4 py-2">Skills</th>
+                <th class="border px-4 py-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($experts as $expert)
+                <tr>
+                    <td class="border px-4 py-2">{{ $expert->name }}</td>
+                    <td class="border px-4 py-2">{{ $expert->email }}</td>
+                    <td class="border px-4 py-2">{{ $expert->location }}</td>
+                    <td class="border px-4 py-2">
+                        {{ $expert->skills->pluck('name')->join(', ') }}
+                    </td>
+                    <td class="border px-4 py-2">
+                        <a href="{{ route('experts.edit', $expert->id) }}" class="text-blue-500">Edit</a>
+                        <form action="{{ route('experts.destroy', $expert->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button class="text-red-500 ml-2" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 </div>
 @endsection

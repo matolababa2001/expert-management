@@ -15,4 +15,5 @@ class Expert extends Model
     {
         return $this->belongsToMany(Skill::class);
     }
+    
 }

@@ -42,5 +42,17 @@
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Expert</button>
     </form>
 </div>
+<div class="form-group">
+    <label for="skills">Skills</label>
+    <select name="skills[]" multiple class="form-control">
+        @foreach($skills as $skill)
+            <option value="{{ $skill->id }}"
+                {{ isset($expert) && $expert->skills->contains($skill->id) ? 'selected' : '' }}>
+                {{ $skill->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
 @endsection
 

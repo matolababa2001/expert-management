@@ -8,20 +8,19 @@ use Illuminate\Http\Request;
 
 class ExpertController extends Controller
 {
+    // Public view for all users
     public function publicIndex()
     {
         $experts = Expert::with('skills')->get();
-        return view('experts.index', compact('experts'));
+        return view('experts.public', compact('experts'));
     }
-
-
-
-public function index()
-{
-    $experts = Expert::with('skills')->get();
-    return view('experts.index', compact('experts'));
-}
-
+    
+    // Admin-only listing
+    public function index()
+    {
+        $experts = Expert::with('skills')->get();
+        return view('admin.experts.index', compact('experts'));
+    }
 
     public function create()
     {
@@ -32,24 +31,22 @@ public function index()
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'location' => 'required',
+            'name' => 'required|string',
             'email' => 'required|email',
-            'photo' => 'nullable|image',
-            'certificate' => 'nullable|file|mimes:pdf',
-            'skills' => 'array|required',
+            'location' => 'required|string',
+            'photo' => 'nullable|image|max:2048',
+            'certificate' => 'nullable|mimes:pdf|max:4096',
+            'skills' => 'array',
         ]);
 
-        $expert = new Expert($request->only(['name', 'location', 'email']));
+        $expert = new Expert($request->except('skills', 'photo', 'certificate'));
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('photos', 'public');
-            $expert->photo = $path;
+            $expert->photo = $request->file('photo')->store('photos', 'public');
         }
 
         if ($request->hasFile('certificate')) {
-            $path = $request->file('certificate')->store('certificates', 'public');
-            $expert->certificate = $path;
+            $expert->certificate = $request->file('certificate')->store('certificates', 'public');
         }
 
         $expert->save();
@@ -70,36 +67,36 @@ public function index()
         $expert = Expert::findOrFail($id);
 
         $request->validate([
-            'name' => 'required',
-            'location' => 'required',
+            'name' => 'required|string',
             'email' => 'required|email',
-            'skills' => 'array|required',
+            'location' => 'required|string',
+            'photo' => 'nullable|image|max:2048',
+            'certificate' => 'nullable|mimes:pdf|max:4096',
+            'skills' => 'array',
         ]);
 
-        $expert->update($request->only(['name', 'location', 'email']));
+        $expert->fill($request->except('skills', 'photo', 'certificate'));
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('photos', 'public');
-            $expert->photo = $path;
+            $expert->photo = $request->file('photo')->store('photos', 'public');
         }
 
         if ($request->hasFile('certificate')) {
-            $path = $request->file('certificate')->store('certificates', 'public');
-            $expert->certificate = $path;
+            $expert->certificate = $request->file('certificate')->store('certificates', 'public');
         }
 
+        $expert->save();
         $expert->skills()->sync($request->skills);
 
-        return redirect()->route('experts.index')->with('success', 'Expert updated.');
+        return redirect()->route('experts.index')->with('success', 'Expert updated successfully.');
     }
 
     public function destroy($id)
     {
         $expert = Expert::findOrFail($id);
+        $expert->skills()->detach();
         $expert->delete();
 
-        return redirect()->route('experts.index')->with('success', 'Expert deleted.');
+        return redirect()->route('experts.index')->with('success', 'Expert deleted successfully.');
     }
 }
-
-
