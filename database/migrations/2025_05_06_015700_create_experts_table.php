@@ -14,8 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('experts', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            // Add to your migration file for `experts`
+            $table->string('location')->nullable();
+            $table->string('photo')->nullable(); // path to image
+            $table->string('certificate')->nullable(); // path to PDF
+
         });
     }
 

@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Expert extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['name', 'email']; // Add other fields as needed
+    protected $fillable = [
+        'name', 'email', 'location', 'certificate', 'photo'
+    ];
 
     public function skills()
     {
